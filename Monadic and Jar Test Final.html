@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calumpit Longganisa Monadic and JAR Test</title>
+    <!-- Include SheetJS for Excel Export functionality -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <!-- Include Firebase App and Database SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <style>
+        :root {
+            --primary-color: #8b0000;
+            --primary-hover: #a00000;
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #dddddd;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+            border-radius: 4px;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .sample-header {
+            background-color: #fff3f3;
+            border-left: 5px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-card {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: #fafafa;
+            position: relative;
+        }
+
+        .question-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .options-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .option-label:hover {
+            background: #f0f0f0;
+        }
+
+        .option-label input {
+            margin-right: 12px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 13px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background: #fff;
+        }
+
+        .btn-danger {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+        }
+
+        .btn-excel {
+            background-color: #1d6f42;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .editor-box {
+            background: #eef2f5;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #cbd5e1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 8px 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .stats-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e2e8f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Calumpit Longganisa Monadic & JAR Test</h1>
+    <div class="subtitle">Sensory Evaluation Form</div>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" id="tab-form-btn" onclick="switchTab('form')">Respondent View</button>
+        <button class="tab-btn" id="tab-dashboard-btn" onclick="switchTab('dashboard')">Creator Dashboard</button>
+    </div>
+
+    <!-- RESPONDENT VIEW -->
+    <div id="respondent-view">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+
+        <form id="sensory-form">
+            <div class="sample-header">
+                <h2 id="sample-title" style="margin: 0;">Sample Code: Loading...</h2>
+                <span id="sample-step">Sample 1 of 8</span>
+            </div>
+
+            <div id="questions-container"></div>
+
+            <button type="button" class="btn" onclick="handleNextSample()">Next Sample Code</button>
+        </form>
+
+        <div id="completion-message" class="hidden" style="text-align: center; padding: 40px 10px;">
+            <h2 style="color: var(--primary-color);">Thank You!</h2>
+            <p>Your responses for all test samples have been successfully recorded.</p>
+            <button class="btn" onclick="resetForm()">Submit Another Response</button>
+        </div>
+    </div>
+
+    <!-- CREATOR DASHBOARD VIEW -->
+    <div id="creator-view" class="hidden">
+        <h2>Creator Configuration & Live Management</h2>
+
+        <!-- Sample Code Manager -->
+        <div class="editor-box">
+            <h3>1. Manage Sample Codes</h3>
+            <div style="margin-bottom: 10px;" id="sample-tags-container"></div>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="new-sample-input" placeholder="Enter new sample code (e.g., 999)" style="padding: 8px; flex: 1;">
+                <button class="btn-small" onclick="addSampleCode()">Add Sample</button>
+            </div>
+        </div>
+
+        <!-- Question Editor -->
+        <div class="editor-box">
+            <h3>2. Manage Test Questions</h3>
+            <div id="creator-questions-list"></div>
+            <hr>
+            <h4>Add New Question</h4>
+            <input type="text" id="new-q-text" placeholder="Question Text" style="width: 100%; padding: 8px; margin-bottom: 8px;">
+            <input type="text" id="new-q-opts" placeholder="Options (comma separated, e.g.: Light, Just About Right, Dark)" style="width: 100%; padding: 8px; margin-bottom: 8px;">
+            <button class="btn-small" onclick="addQuestion()">Add Question</button>
+        </div>
+
+        <!-- Data Summary & Export -->
+        <h2>Quantitative Data Summary</h2>
+        <div class="stats-summary">
+            <div>Total Respondents: <span id="total-respondents">0</span></div>
+            <div>
+                <button class="btn-excel" onclick="exportToExcel()">📊 Export Results to Excel</button>
+                <button onclick="clearData()" class="btn-small btn-danger" style="margin-left: 10px;">Reset Response Data</button>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="dashboard-sample-select">Select Sample Code to View Results: </label>
+            <select id="dashboard-sample-select" onchange="renderDashboardData()" style="padding: 5px 10px; font-size: 14px;">
+            </select>
+        </div>
+
+        <div class="dashboard-section">
+            <div id="dashboard-tables-container"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- REALTIME BACKEND SYNC SETUP (Firebase Configuration) ---
+    // Replace with your Firebase project keys to enable multi-device real-time sync across networks:
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT.firebaseapp.com",
+        databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+        projectId: "YOUR_PROJECT",
+        storageBucket: "YOUR_PROJECT.appspot.com",
+        messagingSenderId: "SENDER_ID",
+        appId: "APP_ID"
+    };
+
+    let useFirebase = false; // Set to true when firebaseConfig is populated
+
+    if (useFirebase) {
+        firebase.initializeApp(firebaseConfig);
+    }
+
+    // Default Configuration Schema
+    let sampleCodes = ['296', '571', '427', '684', '813', '547', '304', '111'];
+    
+    let questionsData = [
+        { q: "1. How would you rate the color intensity of the sample?", opts: ["Extremely Light", "Light", "Slightly light", "Just About Right", "Slightly Dark", "Dark", "Extremely Dark"] },
+        { q: "2. How much do you like the appearance (color) of the sample?", opts: ["Extremely Like", "Like", "Like Slightly", "Neither Like nor Dislike", "Dislike Slightly", "Dislike", "Extremely Dislike"] },
+        { q: "3. How would you rate the aroma intensity of the sample?", opts: ["Extremely weak", "weak", "slightly weak", "Just About Right", "Slightly Strong", "Strong", "Extremely Strong"] },
+        { q: "4. How much do you like the aroma of the sample?", opts: ["Extremely Like", "Like", "Like Slightly", "Neither Like nor Dislike", "Dislike Slightly", "Dislike", "Extremely Dislike"] },
+        { q: "5. How would you rate the mouthfeel intensity of the sample?", opts: ["Extremely Soft", "Soft", "Slightly Soft", "Just About Right", "Slightly Firm", "Firm", "Extremely Firm"] },
+        { q: "6. How much do you like the mouthfeel of the sample?", opts: ["Extremely Like", "Like", "Like Slightly", "Neither Like nor Dislike", "Dislike Slightly", "Dislike", "Extremely Dislike"] },
+        { q: "7. How would you rate the juiciness intensity of the sample?", opts: ["Extremely Dry", "Dry", "Slightly Dry", "Just About Right", "Slightly Juicy", "Juicy", "Extremely Juicy"] },
+        { q: "8. How much do you like the juiciness of the sample?", opts: ["Extremely Like", "Like", "Like Slightly", "Neither Like nor Dislike", "Dislike Slightly", "Dislike", "Extremely Dislike"] },
+        { q: "9. How would you rate the garlic intensity of the sample?", opts: ["No garlic taste", "Trace garlic taste", "Faint garlic taste", "Just About Right", "Moderate garlic taste", "Strong garlic taste", "Very strong garlic taste"] },
+        { q: "10. How much do you like the garlic intensity of the sample?", opts: ["Extremely Like", "Like", "Like Slightly", "Neither Like nor Dislike", "Dislike Slightly", "Dislike", "Extremely Dislike"] },
+        { q: "11. How would you rate the sweetness of the sample?", opts: ["Not Sweet", "Trace sweetness", "Faint sweetness", "Just About Right", "Moderate sweetness", "Strong sweetness", "Very strong sweetness"] },
+        { q: "12. How much do you like the sweetness of the sample?", opts: ["Extremely Like", "Like", "Like Slightly", "Neither Like nor Dislike", "Dislike Slightly", "Dislike", "Extremely Dislike"] },
+        { q: "13. How would you rate the spiciness of the sample?", opts: ["Not spicy", "Trace spiciness", "Faint spiciness", "Just About Right", "Moderate spiciness", "Strong spiciness", "Very strong spiciness"] },
+        { q: "14. How much do you like the spiciness of the sample?", opts: ["Extremely Like", "Like", "Like Slightly", "Neither Like nor Dislike", "Dislike Slightly", "Dislike", "Extremely Dislike"] },
+        { q: "15. How would you rate the smokiness of the sample?", opts: ["Not smoky", "Trace smokiness", "Faint smokiness", "Just About Right", "Moderately smoky", "Heavily smoky", "Extremely smoky"] },
+        { q: "16. How much do you like the smokiness of the sample?", opts: ["Extremely Like", "Like", "Like Slightly", "Neither Like nor Dislike", "Dislike Slightly", "Dislike", "Extremely Dislike"] },
+        { q: "17. How would you rate the flavor delivery of the sample?", opts: ["Extremely weak", "weak", "slightly weak", "Just About Right", "Slightly Strong", "Strong", "Extremely Strong"] },
+        { q: "18. How much do you like the flavor delivery of the sample?", opts: ["Extremely Like", "Like", "Like Slightly", "Neither Like nor Dislike", "Dislike Slightly", "Dislike", "Extremely Dislike"] },
+        { q: "19. How would you rate the aftertaste of the sample?", opts: ["Extremely Clean", "Clean", "Slightly Clean", "Just About Right", "Slightly Lingering", "Lingering", "Extremely Lingering"] },
+        { q: "20. How much do you like the aftertaste of the sample?", opts: ["Extremely Like", "Like", "Like Slightly", "Neither Like nor Dislike", "Dislike Slightly", "Dislike", "Extremely Dislike"] },
+        { q: "21. How much do you like the overall profile of the sample?", opts: ["Extremely Like", "Like", "Like Slightly", "Neither Like nor Dislike", "Dislike Slightly", "Dislike", "Extremely Dislike"] }
+    ];
+
+    let currentSampleIndex = 0;
+    let currentResponses = {};
+    let isDashboardAuthenticated = false;
+
+    function init() {
+        loadState();
+        listenToStorageUpdates();
+        populateDashboardDropdown();
+        loadSampleQuestions();
+    }
+
+    // Save and load persistent form configuration state
+    function saveState() {
+        const config = { sampleCodes, questionsData };
+        localStorage.setItem('sensoryTestConfig', JSON.stringify(config));
+        
+        if (useFirebase) {
+            firebase.database().ref('sensoryConfig').set(config);
+        } else {
+            // Trigger local cross-tab sync broadcast
+            window.dispatchEvent(new Event('storage'));
+        }
+    }
+
+    function loadState() {
+        if (useFirebase) {
+            firebase.database().ref('sensoryConfig').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    sampleCodes = data.sampleCodes || sampleCodes;
+                    questionsData = data.questionsData || questionsData;
+                    refreshActiveViews();
+                }
+            });
+        } else {
+            const savedConfig = localStorage.getItem('sensoryTestConfig');
+            if (savedConfig) {
+                const parsed = JSON.parse(savedConfig);
+                sampleCodes = parsed.sampleCodes || sampleCodes;
+                questionsData = parsed.questionsData || questionsData;
+            }
+        }
+    }
+
+    function listenToStorageUpdates() {
+        window.addEventListener('storage', () => {
+            const savedConfig = localStorage.getItem('sensoryTestConfig');
+            if (savedConfig) {
+                const parsed = JSON.parse(savedConfig);
+                sampleCodes = parsed.sampleCodes || sampleCodes;
+                questionsData = parsed.questionsData || questionsData;
+                refreshActiveViews();
+            }
+        });
+    }
+
+    function refreshActiveViews() {
+        if (currentSampleIndex >= sampleCodes.length) {
+            currentSampleIndex = 0;
+        }
+        loadSampleQuestions();
+        populateDashboardDropdown();
+        if (isDashboardAuthenticated) {
+            renderCreatorQuestionList();
+            renderSampleTags();
+            renderDashboardData();
+        }
+    }
+
+    // --- FORM LOGIC ---
+    function loadSampleQuestions() {
+        if (sampleCodes.length === 0) {
+            document.getElementById('questions-container').innerHTML = '<p>No samples configured.</p>';
+            return;
+        }
+
+        const sampleCode = sampleCodes[currentSampleIndex];
+        document.getElementById('sample-title').textContent = `Sample Code #${sampleCode}`;
+        document.getElementById('sample-step').textContent = `Sample ${currentSampleIndex + 1} of ${sampleCodes.length}`;
+        
+        const progressPercentage = (currentSampleIndex / sampleCodes.length) * 100;
+        document.getElementById('progress-fill').style.width = `${progressPercentage}%`;
+
+        const container = document.getElementById('questions-container');
+        container.innerHTML = '';
+
+        questionsData.forEach((item, qIdx) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+
+            const title = document.createElement('div');
+            title.className = 'question-title';
+            title.textContent = item.q;
+            card.appendChild(title);
+
+            const optionsGroup = document.createElement('div');
+            optionsGroup.className = 'options-group';
+
+            item.opts.forEach(opt => {
+                const label = document.createElement('label');
+                label.className = 'option-label';
+                
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = `q_${qIdx}`;
+                radio.value = opt;
+                radio.required = true;
+
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(opt));
+                optionsGroup.appendChild(label);
+            });
+
+            card.appendChild(optionsGroup);
+            container.appendChild(card);
+        });
+
+        window.scrollTo(0, 0);
+    }
+
+    function handleNextSample() {
+        const form = document.getElementById('sensory-form');
+        
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const sampleCode = sampleCodes[currentSampleIndex];
+        currentResponses[sampleCode] = {};
+
+        questionsData.forEach((_, qIdx) => {
+            const selectedOpt = document.querySelector(`input[name="q_${qIdx}"]:checked`).value;
+            currentResponses[sampleCode][qIdx] = selectedOpt;
+        });
+
+        currentSampleIndex++;
+
+        if (currentSampleIndex < sampleCodes.length) {
+            loadSampleQuestions();
+        } else {
+            saveAllResponses();
+            showCompletion();
+        }
+    }
+
+    function saveAllResponses() {
+        let storedData = JSON.parse(localStorage.getItem('sensoryTestResponses') || '[]');
+        storedData.push(currentResponses);
+        localStorage.setItem('sensoryTestResponses', JSON.stringify(storedData));
+        if (useFirebase) {
+            firebase.database().ref('responses').push(currentResponses);
+        }
+    }
+
+    function showCompletion() {
+        document.getElementById('sensory-form').classList.add('hidden');
+        document.getElementById('completion-message').classList.remove('hidden');
+        document.getElementById('progress-fill').style.width = `100%`;
+    }
+
+    function resetForm() {
+        currentSampleIndex = 0;
+        currentResponses = {};
+        document.getElementById('completion-message').classList.add('hidden');
+        document.getElementById('sensory-form').classList.remove('hidden');
+        loadSampleQuestions();
+    }
+
+    function switchTab(tab) {
+        if (tab === 'form') {
+            document.getElementById('respondent-view').classList.remove('hidden');
+            document.getElementById('creator-view').classList.add('hidden');
+            document.getElementById('tab-form-btn').classList.add('active');
+            document.getElementById('tab-dashboard-btn').classList.remove('active');
+        } else {
+            if (!isDashboardAuthenticated) {
+                const user = prompt("Enter Creator Username:");
+                if (user === null) return;
+                const pass = prompt("Enter Creator Password:");
+                if (pass === null) return;
+
+                if (user === "RND" && pass === "RND123") {
+                    isDashboardAuthenticated = true;
+                } else {
+                    alert("Invalid username or password!");
+                    return;
+                }
+            }
+
+            document.getElementById('respondent-view').classList.add('hidden');
+            document.getElementById('creator-view').classList.remove('hidden');
+            document.getElementById('tab-form-btn').classList.remove('active');
+            document.getElementById('tab-dashboard-btn').classList.add('active');
+            
+            renderSampleTags();
+            renderCreatorQuestionList();
+            renderDashboardData();
+        }
+    }
+
+    // --- CREATOR REAL-TIME CONTROLS ---
+
+    // 1. Dynamic Samples
+    function renderSampleTags() {
+        const container = document.getElementById('sample-tags-container');
+        container.innerHTML = '';
+        sampleCodes.forEach((code, idx) => {
+            const tag = document.createElement('span');
+            tag.className = 'tag';
+            tag.innerHTML = `#${code} <button onclick="deleteSampleCode(${idx})" style="border:none; background:none; color:red; cursor:pointer;">&times;</button>`;
+            container.appendChild(tag);
+        });
+    }
+
+    function addSampleCode() {
+        const input = document.getElementById('new-sample-input');
+        const code = input.value.trim();
+        if (code && !sampleCodes.includes(code)) {
+            sampleCodes.push(code);
+            input.value = '';
+            saveState();
+            refreshActiveViews();
+        }
+    }
+
+    function deleteSampleCode(idx) {
+        sampleCodes.splice(idx, 1);
+        saveState();
+        refreshActiveViews();
+    }
+
+    // 2. Dynamic Questions
+    function renderCreatorQuestionList() {
+        const container = document.getElementById('creator-questions-list');
+        container.innerHTML = '';
+
+        questionsData.forEach((item, idx) => {
+            const div = document.createElement('div');
+            div.style.marginBottom = '10px';
+            div.style.padding = '8px';
+            div.style.background = '#fff';
+            div.style.borderRadius = '4px';
+
+            div.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong>Q${idx + 1}: ${item.q}</strong>
+                    <div>
+                        <button class="btn-small" onclick="editQuestion(${idx})">Edit</button>
+                        <button class="btn-small btn-danger" onclick="deleteQuestion(${idx})">Delete</button>
+                    </div>
+                </div>
+                <div style="font-size: 12px; color: #666; margin-top: 4px;">Options: ${item.opts.join(', ')}</div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function addQuestion() {
+        const qText = document.getElementById('new-q-text').value.trim();
+        const optsText = document.getElementById('new-q-opts').value.trim();
+
+        if (qText && optsText) {
+            const optsArray = optsText.split(',').map(s => s.trim()).filter(Boolean);
+            questionsData.push({ q: qText, opts: optsArray });
+            document.getElementById('new-q-text').value = '';
+            document.getElementById('new-q-opts').value = '';
+            saveState();
+            refreshActiveViews();
+        } else {
+            alert('Please provide both question text and options.');
+        }
+    }
+
+    function editQuestion(idx) {
+        const item = questionsData[idx];
+        const newText = prompt("Edit Question Text:", item.q);
+        if (newText === null) return;
+        const newOpts = prompt("Edit Options (comma separated):", item.opts.join(', '));
+        if (newOpts === null) return;
+
+        questionsData[idx].q = newText;
+        questionsData[idx].opts = newOpts.split(',').map(s => s.trim()).filter(Boolean);
+        saveState();
+        refreshActiveViews();
+    }
+
+    function deleteQuestion(idx) {
+        if (confirm("Delete this question?")) {
+            questionsData.splice(idx, 1);
+            saveState();
+            refreshActiveViews();
+        }
+    }
+
+    // --- DASHBOARD DATA & EXPORT ---
+    function populateDashboardDropdown() {
+        const select = document.getElementById('dashboard-sample-select');
+        select.innerHTML = '';
+        sampleCodes.forEach(code => {
+            const opt = document.createElement('option');
+            opt.value = code;
+            opt.textContent = `Sample Code #${code}`;
+            select.appendChild(opt);
+        });
+    }
+
+    function renderDashboardData() {
+        const storedData = JSON.parse(localStorage.getItem('sensoryTestResponses') || '[]');
+        document.getElementById('total-respondents').textContent = storedData.length;
+
+        const selectedSample = document.getElementById('dashboard-sample-select').value;
+        const container = document.getElementById('dashboard-tables-container');
+        container.innerHTML = '';
+
+        if (storedData.length === 0 || !selectedSample) {
+            container.innerHTML = '<p>No respondent data recorded yet.</p>';
+            return;
+        }
+
+        questionsData.forEach((item, qIdx) => {
+            const counts = {};
+            item.opts.forEach(opt => counts[opt] = 0);
+
+            storedData.forEach(entry => {
+                if (entry[selectedSample] && entry[selectedSample][qIdx]) {
+                    const ans = entry[selectedSample][qIdx];
+                    if (counts[ans] !== undefined) counts[ans]++;
+                }
+            });
+
+            const wrapper = document.createElement('div');
+            wrapper.style.marginBottom = '20px';
+
+            const title = document.createElement('h4');
+            title.textContent = item.q;
+            title.style.margin = '10px 0 5px 0';
+            wrapper.appendChild(title);
+
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Option</th>
+                        <th>Count</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${item.opts.map(opt => {
+                        const cnt = counts[opt];
+                        const pct = storedData.length > 0 ? ((cnt / storedData.length) * 100).toFixed(1) : 0;
+                        return `
+                            <tr>
+                                <td>${opt}</td>
+                                <td>${cnt}</td>
+                                <td>${pct}%</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            `;
+            wrapper.appendChild(table);
+            container.appendChild(wrapper);
+        });
+    }
+
+    function exportToExcel() {
+        const storedData = JSON.parse(localStorage.getItem('sensoryTestResponses') || '[]');
+        if (storedData.length === 0) {
+            alert('No data available to export!');
+            return;
+        }
+
+        const wb = XLSX.utils.book_new();
+
+        sampleCodes.forEach(code => {
+            const sheetRows = [];
+            
+            questionsData.forEach((item, qIdx) => {
+                const counts = {};
+                item.opts.forEach(opt => counts[opt] = 0);
+
+                storedData.forEach(entry => {
+                    if (entry[code] && entry[code][qIdx]) {
+                        const ans = entry[code][qIdx];
+                        if (counts[ans] !== undefined) counts[ans]++;
+                    }
+                });
+
+                sheetRows.push([item.q, "", ""]);
+                sheetRows.push(["Option", "Count", "Percentage"]);
+
+                item.opts.forEach(opt => {
+                    const cnt = counts[opt];
+                    const pct = ((cnt / storedData.length) * 100).toFixed(1) + "%";
+                    sheetRows.push([opt, cnt, pct]);
+                });
+
+                sheetRows.push([]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(sheetRows);
+            XLSX.utils.book_append_sheet(wb, ws, `Sample #${code}`);
+        });
+
+        XLSX.writeFile(wb, "Calumpit_Longganisa_JAR_Results.xlsx");
+    }
+
+    function clearData() {
+        if (confirm('Are you sure you want to delete all saved respondent data?')) {
+            localStorage.removeItem('sensoryTestResponses');
+            if (useFirebase) firebase.database().ref('responses').remove();
+            renderDashboardData();
+        }
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
